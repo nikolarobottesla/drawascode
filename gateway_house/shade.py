@@ -1,6 +1,7 @@
 import math
 
 import cadquery as cq
+import ezdxf
 import numpy as np
 
 from cadquery import exporters
@@ -8,7 +9,7 @@ from cadquery import exporters
 # dimensions are in inches
 
 platform_thickness = 7 / 8
-material_thickness = 5 / 32
+material_thickness = 5 / 32 
 half_thick = material_thickness / 2
 side_bot = 11
 side_back = 21
@@ -22,7 +23,8 @@ top_angle = math.atan((side_back - side_front) / side_bot) * 180 / math.pi
 hook_length = .7
 hook_width = .25
 hook_width2 = .35
-hook_opening = material_thickness
+hook_opening = material_thickness - 1/64  # shrunk by 1/64 for laser/friction fit
+# 20220811 (_1 release) has -1/32", 1/64 probably would have been better
 bot_hook_open = platform_thickness
 n_bot_hooks = 4
 n_front_hooks = 5
@@ -106,8 +108,24 @@ top = top.rotate((side_bot, 0, side_front), (side_bot, 1, side_front), -90 + top
 side_surface = sides.faces(">Y").workplane().section()
 exporters.export(side_surface, 'side.dxf')
 
+# need to notch the top and front for some reason or else they don't get interpreted as one shape
+front_surface = cq.Workplane("XY", origin=front_origin).box(0.3,0.3,0.3)
+front_surface = front.cut(front_surface)
 front_surface = front_surface.faces(">X").workplane().section()
 exporters.export(front_surface, 'front.dxf')
 
+top_notch = cq.Workplane("XY", origin=top_origin).box(0.3,0.3,0.3)
+top_surface = top_surface.cut(top_notch)
 top_surface = top_surface.faces(">X").workplane().section()
 exporters.export(top_surface, 'top.dxf')
+
+# doc = ezdxf.readfile('front.dxf')
+# msp = doc.modelspace()
+# doc.layers.add(name="boundary", color=7, linetype="CONTINUOUS")
+# width = front_width + 1
+# height = front_height + 1
+# points = np.array(([-1, -1], [width, -1], [width, height], [-1, height], [-1, -1]))
+# msp.add_lwpolyline(points, dxfattribs={"layer": "boundary"})
+# doc.saveas('front.dxf')
+
+del top_surface, side_surface, front_surface, top_notch
