@@ -106,10 +106,6 @@ top = top.rotate((side_bot, 0, side_front), (side_bot, 1, side_front), -90 + top
 side_surface = sides.faces(">Y").workplane().section()
 exporters.export(side_surface, 'side.dxf')
 
-bnd_bx = cq.Workplane("XY").box(1, front_width + 2 * hook_width2 + 1, side_front + side_top + 1, centered=tripple_false)
-bnd_bx = bnd_bx.translate((-0.5,-0.5,-0.5))
-
-front_surface = front.union(bnd_bx)
 front_surface = front_surface.faces(">X").workplane().section()
 exporters.export(front_surface, 'front.dxf')
 
