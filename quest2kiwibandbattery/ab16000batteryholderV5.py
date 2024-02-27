@@ -93,7 +93,7 @@ s_wall_thick = holder_wall_thickness - 2 * shell_thick
 half_col_x = s_width / 2 + holder_wall_thickness
 s_loc_x = (half_col_x, build_max / 2, build_max - half_col_x)
 s_loc_y = s_thick_s + s_wall_thick + bat_thick / 2
-s_locs = [(s_loc_x[0], s_loc_y), (s_loc_x[1], s_loc_y),
+s_locs = [(s_loc_x[0], s_loc_y), (s_loc_x[1], s_loc_y), 
           (s_loc_x[2], s_loc_y), (s_loc_x[1], -s_loc_y)]
 s_holes = cq.Workplane("XY").pushPoints(s_locs)
 s_holes = s_holes.rect(s_width_s, s_thick_s).extrude(build_max)
